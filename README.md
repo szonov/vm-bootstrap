@@ -32,6 +32,15 @@ The scripts explicitly check the operating system and will refuse to run on anyt
 
 Support for additional distributions may be added in the future if I personally need them.
 
+## Tested Versions
+
+The scripts have been tested only on:
+
+- Debian 13
+- Ubuntu 24.04 LTS
+
+They may work on other versions of Debian or Ubuntu, but this has not been verified.
+
 ## Important
 
 These scripts **do not install an operating system**.
@@ -128,7 +137,7 @@ The project is designed to be easy to fork and customize. If your environment di
 
 The scripts are developed and tested exclusively on virtual machines running under **Synology Virtual Machine Manager**.
 
-They may work on other virtualization platforms, but this is neither tested nor guaranteed.
+Compatibility with other hypervisors (such as KVM, Proxmox VE, VMware ESXi, Hyper-V, VirtualBox, etc.) has not been tested and is not guaranteed.
 
 ## License
 
@@ -136,4 +145,4 @@ This project is licensed under the MIT License.
 
 Although it was originally created for my own workflow, you are welcome to use, modify and redistribute it under the terms of the MIT License.
 
-See the `LICENSE` file for details.
+See the [LICENSE](LICENSE) file for details.
