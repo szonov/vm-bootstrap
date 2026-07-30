@@ -139,6 +139,31 @@ The scripts are developed and tested exclusively on virtual machines running und
 
 Compatibility with other hypervisors (such as KVM, Proxmox VE, VMware ESXi, Hyper-V, VirtualBox, etc.) has not been tested and is not guaranteed.
 
+
+## Scripts
+
+The `scripts/` directory contains standalone installation and configuration scripts.
+
+Each script is self-contained and can be executed independently on supported systems. They are intended to simplify provisioning of specific components without running the full bootstrap process.
+
+### install-amneziawg.sh
+
+Installs the AmneziaWG kernel module and `amneziawg-tools` (`awg` and `awg-quick`) on Debian and Ubuntu.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/szonov/vm-bootstrap/main/scripts/install-amneziawg.sh | sudo bash
+```
+
+### install-sing-box.sh
+
+Installs the latest version of sing-box.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/szonov/vm-bootstrap/main/scripts/install-sing-box.sh | sudo bash
+```
+
+> Additional scripts will be added over time. Each script can be executed independently.
+
 ## License
 
 This project is licensed under the MIT License.

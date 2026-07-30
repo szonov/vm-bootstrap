@@ -82,6 +82,7 @@ apt install -y \
     git \
     tcpdump \
     wget \
+    curl \
     ca-certificates
 
 echo "== Configuring sudo access =="
