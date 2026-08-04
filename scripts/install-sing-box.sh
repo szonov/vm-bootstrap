@@ -2,7 +2,7 @@
 
 set -Eeuo pipefail
 
-readonly SINGBOX_VERSION="v1.14.0-beta.3"
+readonly SINGBOX_VERSION="v1.14.0-beta.5"
 
 log() {
     printf '\n\033[1;32m==>\033[0m %s\n' "$*"
