@@ -203,47 +203,66 @@ install_kernel_module() {
         exit 1
     fi
 
+    #
+    # AmneziaWG upstream всегда использует DKMS version 1.0.0,
+    # поэтому при обновлении исходников старую регистрацию
+    # необходимо удалить и зарегистрировать модуль заново.
+    #
+
+    if dkms status "${DKMS_MODULE}/${DKMS_VERSION}" >/dev/null 2>&1; then
+        log "Удаление предыдущей версии ${DKMS_MODULE}/${DKMS_VERSION} из DKMS"
+
+        dkms remove \
+            -m "${DKMS_MODULE}" \
+            -v "${DKMS_VERSION}" \
+            --all
+    fi
+
     log "Подготовка исходников AmneziaWG для DKMS"
+
+    rm -rf "/usr/src/${DKMS_MODULE}-${DKMS_VERSION}"
 
     make -C "${MODULE_DIR}/src" dkms-install
 
-    log "Проверка регистрации модуля в DKMS"
+    log "Регистрация модуля в DKMS"
 
-    if ! dkms status "${DKMS_MODULE}/${DKMS_VERSION}" 2>/dev/null \
-        | grep -qE 'added|built|installed'; then
-        dkms add \
-            -m "${DKMS_MODULE}" \
-            -v "${DKMS_VERSION}"
-    fi
+    dkms add \
+        -m "${DKMS_MODULE}" \
+        -v "${DKMS_VERSION}"
 
     log "Сборка модуля для ядра ${KERNEL_VERSION}"
 
-    if ! dkms status "${DKMS_MODULE}/${DKMS_VERSION}" 2>/dev/null \
-        | grep -F "${KERNEL_VERSION}" \
-        | grep -q "installed"; then
+    dkms build \
+        -m "${DKMS_MODULE}" \
+        -v "${DKMS_VERSION}" \
+        -k "${KERNEL_VERSION}"
 
-        dkms build \
-            -m "${DKMS_MODULE}" \
-            -v "${DKMS_VERSION}" \
-            -k "${KERNEL_VERSION}"
+    log "Установка модуля для ядра ${KERNEL_VERSION}"
 
-        dkms install \
-            -m "${DKMS_MODULE}" \
-            -v "${DKMS_VERSION}" \
-            -k "${KERNEL_VERSION}"
-    else
-        log "Модуль уже установлен для ядра ${KERNEL_VERSION}"
-    fi
+    dkms install \
+        -m "${DKMS_MODULE}" \
+        -v "${DKMS_VERSION}" \
+        -k "${KERNEL_VERSION}"
 
     log "Обновление зависимостей модулей"
+
     depmod -a "${KERNEL_VERSION}"
 
     log "Настройка автоматической загрузки модуля"
+
     printf '%s\n' "${DKMS_MODULE}" \
         > "/etc/modules-load.d/${DKMS_MODULE}.conf"
 
     if lsmod | grep -q "^${DKMS_MODULE}[[:space:]]"; then
-        log "Модуль ${DKMS_MODULE} уже загружен"
+        log "Перезагрузка модуля ${DKMS_MODULE}"
+
+        modprobe -r "${DKMS_MODULE}" || {
+            warn "Модуль используется активным интерфейсом и не может быть выгружен."
+            warn "Новая версия будет загружена после перезагрузки системы."
+            return
+        }
+
+        modprobe "${DKMS_MODULE}"
     else
         log "Загрузка модуля ${DKMS_MODULE}"
         modprobe "${DKMS_MODULE}"
